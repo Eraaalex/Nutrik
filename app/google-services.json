@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "875699790871",
+    "project_id": "nutrik-a45a8",
+    "storage_bucket": "nutrik-a45a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875699790871:android:e356cb256246b0b19ee852",
+        "android_client_info": {
+          "package_name": "com.hse.coursework.nutrik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3NR6B1J1t-mPtUI5Q6whkxRA4hthsBG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
