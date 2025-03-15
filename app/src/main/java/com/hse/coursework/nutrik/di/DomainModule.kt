@@ -26,8 +26,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DomainModule {
-
-
     @Provides
     @Singleton
     fun provideLocalDataSource(
@@ -39,11 +37,27 @@ object DomainModule {
         return LocalDataSource(progressDao, productDao, favoriteDao, consumptionDao)
     }
 
-
     @Provides
     @Singleton
     fun provideRemoteDataSource(firebaseService: FirebaseService): RemoteDataSource {
         return RemoteDataSource(firebaseService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideConsumptionRepository(
+        localDataSource: LocalDataSource,
+        remoteDataSource: RemoteDataSource
+    ): ConsumptionRepository {
+        return ConsumptionRepositoryImpl(localDataSource, remoteDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        remoteDataSource: RemoteAuthService
+    ): UserRepository {
+        return UserRepository(remoteAuthService = remoteDataSource)
     }
 
     @Provides
@@ -55,7 +69,12 @@ object DomainModule {
         return RemoteAuthService(firebaseFirestore, firebaseAuth)
     }
 
-
+    @Provides
+    @Singleton
+    fun provideChatRepository(
+    ): ChatRepository {
+        return ChatRepository()
+    }
 
     @Provides
     @Singleton
