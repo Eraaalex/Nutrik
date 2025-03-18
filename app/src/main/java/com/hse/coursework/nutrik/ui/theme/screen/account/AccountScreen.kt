@@ -50,7 +50,9 @@ import com.hse.coursework.nutrik.R
 import com.hse.coursework.nutrik.model.Restriction
 import com.hse.coursework.nutrik.model.dto.Gender
 import com.hse.coursework.nutrik.navigation.Screen
+import com.hse.coursework.nutrik.ui.theme.components.account.InfoItem
 import com.hse.coursework.nutrik.ui.theme.components.account.RestrictionSelector
+import com.hse.coursework.nutrik.ui.theme.components.account.genderToText
 
 @Composable
 fun AccountScreen(
@@ -254,88 +256,3 @@ fun AccountScreen(
     }
 }
 
-@Composable
-fun InfoItem(
-    label: String,
-    value: String? = null,
-    onClick: (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFFDFDEB), shape = RoundedCornerShape(20.dp))
-            .clickable(enabled = onClick != null) { onClick?.invoke() }
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF4E7344)
-        )
-        if (value != null) {
-            Text(
-                text = value,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4E7344)
-            )
-        }
-    }
-}
-
-fun genderToText(gender: Gender): String = when (gender) {
-    Gender.MALE -> "Мужской"
-    Gender.FEMALE -> "Женский"
-    Gender.OTHER -> "Другое"
-    Gender.UNSPECIFIED -> "Не указано"
-}
-
-
-@Composable
-fun RestrictionItem(
-    selected: List<Restriction>,
-    onToggleRestriction: (Restriction) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFFDFDEB), shape = RoundedCornerShape(20.dp))
-            .padding(16.dp),
-
-        ) {
-        Text(
-            text = "Пищевые ограничения",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF4E7344)
-        )
-        Spacer(Modifier.height(8.dp))
-
-        Restriction.values().filter { it != Restriction.NONE }.forEach { restriction ->
-            val checked = restriction in selected
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onToggleRestriction(restriction) }
-                    .padding(vertical = 4.dp)
-            ) {
-                Checkbox(
-                    checked = checked,
-                    onCheckedChange = { onToggleRestriction(restriction) },
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4E7344))
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = restriction.russianName,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4E7344)
-                )
-            }
-        }
-    }
-}
