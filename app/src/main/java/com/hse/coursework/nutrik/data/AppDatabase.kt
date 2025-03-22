@@ -3,19 +3,19 @@ package com.hse.coursework.nutrik.data
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.hse.coursework.nutrik.data.dao.ConsumeDao
+import com.hse.coursework.nutrik.data.dao.FavoriteDao
+import com.hse.coursework.nutrik.data.dao.ProductDao
+import com.hse.coursework.nutrik.data.dao.ProgressDao
 import com.hse.coursework.nutrik.model.ConsumptionEntity
 import com.hse.coursework.nutrik.model.FavoriteEntity
-import com.hse.coursework.nutrik.model.Product
-import com.hse.coursework.nutrik.model.ProgressItem
-import com.hse.coursework.nutrik.model.dao.ConsumeDao
-import com.hse.coursework.nutrik.model.dao.FavoriteDao
-import com.hse.coursework.nutrik.model.dao.ProductDao
-import com.hse.coursework.nutrik.model.dao.ProgressDao
+import com.hse.coursework.nutrik.model.ProductEntity
+import com.hse.coursework.nutrik.ui.theme.screen.main.ProgressEntity
 import com.hse.coursework.nutrik.utils.ConverterUtil
 
 @Database(
-    entities = [ProgressItem::class, Product::class, FavoriteEntity::class, ConsumptionEntity::class],
-    version = 4,
+    entities = [ProgressEntity::class, ProductEntity::class, FavoriteEntity::class, ConsumptionEntity::class],
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(ConverterUtil::class)
