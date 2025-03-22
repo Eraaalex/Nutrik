@@ -10,7 +10,7 @@ import com.hse.coursework.nutrik.model.ProductDTO
 import com.hse.coursework.nutrik.model.ProductEntity
 import com.hse.coursework.nutrik.model.ProgressItem
 import com.hse.coursework.nutrik.model.ProgressRemoteEntity
-import com.hse.coursework.nutrik.model.toDomain
+import com.hse.coursework.nutrik.model.dto.toDomain
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
