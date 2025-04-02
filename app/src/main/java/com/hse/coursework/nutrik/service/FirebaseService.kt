@@ -11,6 +11,7 @@ import com.hse.coursework.nutrik.model.ProductEntity
 import com.hse.coursework.nutrik.model.ProgressItem
 import com.hse.coursework.nutrik.model.ProgressRemoteEntity
 import com.hse.coursework.nutrik.model.dto.toDomain
+import com.hse.coursework.nutrik.model.toDomain
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -263,7 +264,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
         val snapshot = firebaseFirestore
             .collection("users")
             .document(userId)
-            .collection("consumption")
+            .collection(CONSUMPTION_COLLECTION)
             .whereGreaterThanOrEqualTo(FieldPath.documentId(), from)
             .whereLessThanOrEqualTo(FieldPath.documentId(), to)
             .get()

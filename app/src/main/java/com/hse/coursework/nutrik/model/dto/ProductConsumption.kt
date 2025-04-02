@@ -1,4 +1,4 @@
-package com.hse.coursework.nutrik.model
+package com.hse.coursework.nutrik.model.dto
 
 import java.util.Date
 
