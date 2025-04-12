@@ -10,12 +10,12 @@ import com.hse.coursework.nutrik.data.dao.ProgressDao
 import com.hse.coursework.nutrik.model.ConsumptionEntity
 import com.hse.coursework.nutrik.model.FavoriteEntity
 import com.hse.coursework.nutrik.model.ProductEntity
-import com.hse.coursework.nutrik.ui.theme.screen.main.ProgressEntity
+import com.hse.coursework.nutrik.model.ProgressEntity
 import com.hse.coursework.nutrik.utils.ConverterUtil
 
 @Database(
     entities = [ProgressEntity::class, ProductEntity::class, FavoriteEntity::class, ConsumptionEntity::class],
-    version = 7,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(ConverterUtil::class)
