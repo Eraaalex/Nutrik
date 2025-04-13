@@ -2,10 +2,10 @@ package com.hse.coursework.nutrik.service
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.hse.coursework.nutrik.model.FirestoreUserDTO
+import com.hse.coursework.nutrik.model.dto.FirestoreUserDTO
 import com.hse.coursework.nutrik.model.dto.User
-import com.hse.coursework.nutrik.model.toDTO
-import com.hse.coursework.nutrik.model.toDomain
+import com.hse.coursework.nutrik.model.dto.toDTO
+import com.hse.coursework.nutrik.model.dto.toDomain
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
