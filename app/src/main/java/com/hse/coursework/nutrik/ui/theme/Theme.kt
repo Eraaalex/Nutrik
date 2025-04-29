@@ -26,12 +26,11 @@ private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF4CAF50), // Зеленый
     secondary = Color(0xFF03A9F4), // Голубой
     background = Color(0xFFF5F5F5), // Светло-серый
-    surface = Color.White, // Белый
+    surface = Color(0xFFFDF6C8), // Белый
     onPrimary = Color.White,
     onSecondary = Color.White,
     onBackground = Color.Black,
     onSurface = Color.Black
-
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),

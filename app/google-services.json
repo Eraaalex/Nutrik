@@ -12,7 +12,20 @@
           "package_name": "com.hse.coursework.nutrik"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "875699790871-ev6eo9k2f3ggj8nccfn5eo4vtegindnf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hse.coursework.nutrik",
+            "certificate_hash": "5774693e5729820a7751141edaf182f9e33db4b0"
+          }
+        },
+        {
+          "client_id": "875699790871-ri4pmv1beo87dd1ovaa8jrgu5hnfi2na.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC3NR6B1J1t-mPtUI5Q6whkxRA4hthsBG0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "875699790871-ri4pmv1beo87dd1ovaa8jrgu5hnfi2na.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

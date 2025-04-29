@@ -63,6 +63,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0")
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -137,19 +139,33 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.3.0")
 
-    //
-//    implementation("com.sun.mail:javax.mail:1.6.2")
     implementation("com.sun.mail:android-mail:1.6.2")
     implementation("com.sun.mail:android-activation:1.6.2")
-    // Или для Jakarta Mail:
-//    implementation("jakarta.mail:jakarta.mail-api:2.0.1")
-//    implementation("com.sun.mail:jakarta.mail:2.0.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.6.0")
 
+// CameraX
+    implementation("androidx.camera:camera-core:1.4.2")
+    implementation("androidx.camera:camera-camera2:1.4.2")
+    implementation("androidx.camera:camera-lifecycle:1.4.2")
+    implementation("androidx.camera:camera-view:1.4.2")
 
+// ML Kit Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
 
+// Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+// Accompanist
+    implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
+
+    //ListenableFuture
+    implementation("com.google.guava:guava:31.1-jre")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
 
 kapt {

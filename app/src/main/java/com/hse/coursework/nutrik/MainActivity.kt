@@ -3,14 +3,11 @@ package com.hse.coursework.nutrik
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.lifecycleScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.hse.coursework.nutrik.data.AppDatabase
-import com.hse.coursework.nutrik.model.Product
-import com.hse.coursework.nutrik.model.ProgressItem
-import com.hse.coursework.nutrik.model.dao.ProgressDao
+import com.hse.coursework.nutrik.data.dao.ProgressDao
+import com.hse.coursework.nutrik.model.ProgressEntity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 
@@ -25,21 +22,56 @@ class MainActivity : ComponentActivity() {
             NutrikApp()
         }
 
-        lifecycleScope.launch {
-            populateDatabase(database.progressDao())
-        }
 
     }
 }
+
 suspend fun populateDatabase(progressDao: ProgressDao) {
+    val today = LocalDate.now()
+
+
     val testData = listOf(
-        ProgressItem(id = "1", title = "Калории", progress = 0.7f),
-        ProgressItem(id = "2", title = "Белки", progress = 0.5f),
-        ProgressItem(id = "3", title = "Жиры", progress = 0.6f),
-        ProgressItem(id = "4", title = "Углеводы", progress = 0.4f)
+        ProgressEntity(
+            userId = "testUserId1",
+            date = today.toString(),
+            protein = 80,
+            fat = 60,
+            carbs = 250,
+            calories = 2000,
+            sugar = 30,
+            salt = 5,
+            violationsCount = 0
+        ),
+        ProgressEntity(
+            userId = "testUserId1",
+            date = today.minusDays(1).toString(),
+            protein = 90,
+            fat = 70,
+            carbs = 200,
+            calories = 1900,
+            sugar = 25,
+            salt = 4,
+            violationsCount = 1
+        ),
+        ProgressEntity(
+            userId = "testUserId1",
+            date = today.minusDays(2).toString(),
+            protein = 70,
+            fat = 55,
+            carbs = 270,
+            calories = 2100,
+            sugar = 35,
+            salt = 6,
+            violationsCount = 2
+        )
     )
 
-    progressDao.clearProgressData()
-    progressDao.insertAll(testData)
+    progressDao.clearAll()
+
+    testData.forEach { entity ->
+        progressDao.insert(entity)
+    }
 }
+
+
 

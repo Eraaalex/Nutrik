@@ -6,6 +6,7 @@ import com.hse.coursework.nutrik.model.Consumption
 import com.hse.coursework.nutrik.model.ProductEntity
 import com.hse.coursework.nutrik.model.toConsumption
 import com.hse.coursework.nutrik.model.dto.toDTO
+import com.hse.coursework.nutrik.model.toDTO
 import com.hse.coursework.nutrik.service.FirebaseService
 import com.hse.coursework.nutrik.service.PaginatedResult
 import kotlinx.coroutines.flow.Flow
