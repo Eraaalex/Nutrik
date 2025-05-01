@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
+open class AccountViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _user = mutableStateOf(User())
-    val user: State<User> = _user
+    open val user: State<User> = _user
 
     init {
         viewModelScope.launch {

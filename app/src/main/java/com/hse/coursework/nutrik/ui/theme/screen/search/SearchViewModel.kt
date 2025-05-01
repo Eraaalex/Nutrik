@@ -95,17 +95,22 @@ class SearchViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        _searchQuery.value = query.trim()
+        _searchQuery.value = query
         viewModelScope.launch {
             if (isSearchMode) {
                 // удаляем старый список и сразу ищем по всему датасету
-                performFullTextSearch(_searchQuery.value)
+                performFullTextSearch(_searchQuery.value.trim())
             } else {
                 // строка очистилась — возвращаемся к алфавиту
                 loadAlpha(reset = true)
             }
         }
     }
+
+    fun clearSearchResults() {
+        _searchQuery.value = ""
+    }
+
 
     /** Алфавитная (постраничная) загрузка */
     fun loadNextPage() {
@@ -156,20 +161,18 @@ class SearchViewModel @Inject constructor(
 
     /** Поиск по всему датасету (локально + удалённо) */
     private suspend fun performFullTextSearch(query: String) {
-        // 1) сбрасываем любую пагинацию
         lastDocument = null
         hasMore = false
         _isLoading.value = true
 
-        // 2) сначала быстрый поиск в локальной БД (LIKE %query% или FTS)
         val localMatches =
             localDataSource.searchProducts(query = query, limit = Int.MAX_VALUE, offset = 0)
         _productList.value = localMatches
 
         val remoteMatches = remoteDataSource.searchProducts(query = query)
-            .first()    // возвращает List<ProductEntity>
+            .first()
         Log.e("SearchViewModel", "Remote matches: $remoteMatches")
-        // кэшируем и объединяем без дублей
+
         localDataSource.saveProductData(remoteMatches)
         _productList.value = (localMatches + remoteMatches)
             .distinctBy { it.id }

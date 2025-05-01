@@ -87,7 +87,13 @@ fun MainScreen(
             ProgressContent(
                 uiState = uiState,
                 onSelectDate = mainViewModel::onSelectDate,
-                weeklyConsumption = weeklyConsumption
+                weeklyConsumption = weeklyConsumption,
+                onUpdateConsumption = { entry, newWeight ->
+                    mainViewModel.updateConsumption(entry, newWeight)
+                },
+                onDeleteConsumption = { entry ->
+                    mainViewModel.deleteConsumption(entry)
+                }
             )
         }
 

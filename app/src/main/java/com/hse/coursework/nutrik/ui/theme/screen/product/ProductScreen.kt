@@ -1,5 +1,6 @@
 package com.hse.coursework.nutrik.ui.theme.screen.product
 
+import android.app.DatePickerDialog
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,10 +22,13 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DrawerDefaults.shape
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
@@ -67,6 +71,9 @@ import com.hse.coursework.nutrik.model.Restriction
 import com.hse.coursework.nutrik.model.toEntity
 import com.hse.coursework.nutrik.model.toUI
 import com.hse.coursework.nutrik.ui.theme.components.BottomNavigationBar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun ProductDetailScreen(
@@ -132,8 +139,8 @@ fun ProductDetailScreen(
                         .padding(innerPadding)
                         .background(Color(0xFFfffcdf)),
                     restrictions = viewModel.getUserRestrictions(),
-                ) { product, weight ->
-                    viewModel.updateConsumption(product, weight)
+                ) { productEntity, weight, date ->
+                    viewModel.updateConsumption(productEntity, weight, date)
                 }
             }
         }
@@ -155,12 +162,34 @@ fun ProductDetailContent(
     product: Product,
     modifier: Modifier = Modifier,
     restrictions: List<Restriction> = emptyList(),
-    onUpdateConsumption: (ProductEntity, Double) -> Unit
+    onUpdateConsumption: (ProductEntity, Double, LocalDate) -> Unit
 ) {
     var isCompositionExpanded by remember { mutableStateOf(false) }
-    var weight by remember { mutableStateOf(product.weight) }
+    var weight by remember { mutableStateOf(0.0) }
     var state = rememberScrollState()
 
+
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    val dateFormatter = remember {
+        DateTimeFormatter.ofPattern("dd/MM")
+    }
+    val context = LocalContext.current
+
+    LaunchedEffect(showDatePicker) {
+        if (showDatePicker) {
+            DatePickerDialog(
+                context,
+                { _, year, month, day ->
+                    selectedDate = LocalDate.of(year, month + 1, day)
+                    showDatePicker = false
+                },
+                selectedDate.year,
+                selectedDate.monthValue - 1,
+                selectedDate.dayOfMonth
+            ).show()
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -350,7 +379,7 @@ fun ProductDetailContent(
                     color = Color(0xFF3D2C1E),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFfffff0), shape = RoundedCornerShape(8.dp))
+                        .background(Color(0xFFfffcdf), shape = RoundedCornerShape(8.dp))
 
                 )
 
@@ -359,7 +388,7 @@ fun ProductDetailContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        var input by remember { mutableStateOf("${product.weight}") }
+        var input by remember { mutableStateOf("0.0") }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -420,11 +449,48 @@ fun ProductDetailContent(
                 }
             )
 
+
             Spacer(modifier = Modifier.width(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.Transparent)
+                    .border(
+                        width = 1.dp,
+                        color = Color(0xFFFAF1C3),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable { showDatePicker = true }
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Column {
+                    // Лейбл
+                    Text(
+                        text = "Дата",
+                        fontSize = 12.sp,
+                        color = Color(0xFF8A3014)
+                    )
+                    Spacer(Modifier.height(2.dp))
+
+                    Text(
+                        text = selectedDate.format(dateFormatter),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF8A3014)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             Button(
                 onClick = {
                     Log.e("ProductDetailContent", "Button clicked with weight: $weight")
-                    onUpdateConsumption(product.toEntity(), weight)
+                    onUpdateConsumption(product.toEntity(), weight, selectedDate)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD0E4A8)),
                 modifier = Modifier.height(56.dp)
@@ -447,8 +513,6 @@ fun ProductDetailContent(
                 }
 
             }
-
-
         }
 
 
@@ -476,129 +540,4 @@ fun NutrientBox(text: String, label: String, color: Color, modifier: Modifier = 
 fun NutrientBoxPreview() {
     NutrientBox("12 г", "Белки", Color(0xFFF2F8DE))
 }
-//@Composable
-//fun ProductDetailContent(product: ProductEntity, modifier: Modifier = Modifier) {
-//    var isCompositionExpanded by remember { mutableStateOf(false) }
-//
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .padding(16.dp)
-//    ) {
-//        Text(
-//            text = product.description,
-//            fontSize = 14.sp,
-//            color = Color.Gray,
-//            modifier = Modifier.padding(bottom = 16.dp)
-//        )
-//
-//        // КБЖУ
-//        Text(
-//            text = "В 100 граммах",
-//            fontSize = 16.sp,
-//            fontWeight = FontWeight.SemiBold,
-//            modifier = Modifier.padding(bottom = 8.dp)
-//        )
-//        Row(
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                Text(text = "${product.energyValue}", fontWeight = FontWeight.Bold)
-//                Text(text = "Ккал", color = Color.Gray)
-//            }
-//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                Text(text = "${product.proteins}", fontWeight = FontWeight.Bold)
-//                Text(text = "Белки", color = Color.Gray)
-//            }
-//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                Text(text = "${product.fats}", fontWeight = FontWeight.Bold)
-//                Text(text = "Жиры", color = Color.Gray)
-//            }
-//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                Text(text = "${product.carbs}", fontWeight = FontWeight.Bold)
-//                Text(text = "Углеводы", color = Color.Gray)
-//            }
-//        }
-//
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Column(
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .clickable { isCompositionExpanded = !isCompositionExpanded }
-//            ) {
-//                Text(
-//                    text = "Состав",
-//                    fontSize = 16.sp,
-//                    fontWeight = FontWeight.SemiBold,
-//                    modifier = Modifier.weight(1f)
-//                )
-//                Icon(
-//                    imageVector = if (isCompositionExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-//                    contentDescription = "Toggle Composition",
-//                    tint = Color.Gray
-//                )
-//            }
-//            if (isCompositionExpanded) {
-//                Spacer(modifier = Modifier.height(8.dp))
-//                Text(
-//                    text = product.composition.joinToString(", "),
-//                    fontSize = 14.sp,
-//                    color = Color.Gray
-//                )
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun BottomBar(product: ProductEntity, onWeightChange: (Double) -> Unit) {
-//    var weight by remember { mutableStateOf(product.weight) }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color(0xFFFF5139))
-//            .padding(vertical = 12.dp)
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            modifier = Modifier.fillMaxWidth()
-//        ) {
-//            IconButton(
-//                onClick = { if (weight > 0) weight -= 10; onWeightChange(weight) }
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Remove,
-//                    contentDescription = "Decrease weight",
-//                    tint = Color.White
-//                )
-//            }
-//
-//            Text(
-//                text = "$weight г",
-//                fontSize = 16.sp,
-//                fontWeight = FontWeight.Bold,
-//                color = Color.White
-//            )
-//
-//            IconButton(
-//                onClick = { weight += 10; onWeightChange(weight) }
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Add,
-//                    contentDescription = "Increase weight",
-//                    tint = Color.White
-//                )
-//            }
-//        }
-//    }
-//}
-
 

@@ -68,6 +68,13 @@ fun SearchScreen(
             }
     }
 
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            viewModel.loadProducts(reset = true)
+        }
+    }
+
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
@@ -104,7 +111,7 @@ fun SearchScreen(
                 },
                 placeholder = {
                     Text(
-                        text = "Search products",
+                        text = "Поиск продуктов",
                         color = Color(0xFF8A3014).copy(alpha = 0.3f),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -134,8 +141,10 @@ fun SearchScreen(
                     ShortProductCard(
                         product = product,
                         isForbidden = viewModel.isForbidden(product),
-                        navController = navController,
-                    )
+                        navController = navController
+                    ) {
+                        viewModel.clearSearchResults()
+                    }
                 }
 
                 // индикатор внизу
@@ -147,7 +156,7 @@ fun SearchScreen(
                                 .padding(vertical = 16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = Color(0xFF8A3014))
                         }
                     }
                 }

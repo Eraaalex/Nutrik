@@ -129,27 +129,6 @@ fun AccountScreen(
                 navController.navigate(Screen.Auth.route)
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-
-                    }
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Другие элементы",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4E7344)
-                )
-                Icon(
-                    Icons.Default.ArrowForward,
-                    contentDescription = null,
-                    tint = Color(0xFF4E7344)
-                )
-            }
         }
 
         if (showAgeDialog) {

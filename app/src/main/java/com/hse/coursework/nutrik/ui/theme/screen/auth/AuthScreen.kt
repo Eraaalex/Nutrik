@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +48,9 @@ fun AuthScreen(
     LaunchedEffect(viewModel.uiState.isSuccess) {
         if (viewModel.uiState.isSuccess) onAuthSuccess()
     }
+
+    val showResetDialog = remember { mutableStateOf(false) }
+    val resetEmail = remember { mutableStateOf("") }
 
 
     val context = LocalContext.current
@@ -98,6 +102,23 @@ fun AuthScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            if (!viewModel.uiState.isRegister) {
+                TextButton(onClick = {
+                     showResetDialog.value = true
+
+                }) {
+                    Text("Забыли пароль?", color = Color(0xFF4E2215))
+                }
+            }
+        }
+
 
         if (viewModel.uiState.isRegister) {
             OutlinedTextField(
@@ -171,4 +192,39 @@ fun AuthScreen(
 
 
     }
+
+    if (showResetDialog.value) {
+        androidx.compose.material.AlertDialog(
+            onDismissRequest = { showResetDialog.value = false },
+            title = { Text("Сброс пароля",  color = Color(0xFF4E2215)) },
+            backgroundColor = Color(0xFFfffcdf),
+            text = {
+                Column {
+                    Text("Введите ваш email для получения инструкции по сбросу пароля.",  color = Color(0xFF4E2215))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = resetEmail.value,
+                        onValueChange = { resetEmail.value = it },
+                        label = { Text("Email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    // viewModel.onResetPasswordRequest(resetEmail.value)
+                    showResetDialog.value = false
+                }) {
+                    Text("Отправить",  color = Color(0xFF4E2215))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog.value = false }) {
+                    Text("Отмена",  color = Color(0xFF4E2215))
+                }
+            }
+        )
+    }
+
+
 }

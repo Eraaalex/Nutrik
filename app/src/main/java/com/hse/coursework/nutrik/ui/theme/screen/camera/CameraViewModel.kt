@@ -7,14 +7,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hse.coursework.nutrik.model.camera.CameraScanResult
-import com.hse.coursework.nutrik.service.BarcodeScanner
+import com.hse.coursework.nutrik.service.BarcodeScannerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
-    private val analyzer: BarcodeScanner
+    private val analyzer: BarcodeScannerService
 ) : ViewModel() {
 
     var uiState by mutableStateOf(CameraUiState())

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,17 +43,24 @@ class ProductDetailViewModel @Inject constructor(
 
     private val _userRestrictions = MutableStateFlow(emptyList<Restriction>())
 
-    fun updateConsumption(product: ProductEntity, newWeight: Double) {
+    fun updateConsumption(product: ProductEntity, newWeight: Double, date :LocalDate = LocalDate.now()) {
         viewModelScope.launch {
+            if (newWeight <= 0) {
+                Log.e("ProductDetailViewModel", "Invalid weight: $newWeight")
+                return@launch
+            }
             consumptionRepository.updateConsumption(
                 product,
                 newWeight,
-                userId = currentUser?.uid ?: ""
+                userId = currentUser?.uid ?: "",
+                date = date
             )
             progressService.updateProgress(
                 product.toUI(),
                 newWeight,
-                userId = currentUser?.uid ?: ""
+                userId = currentUser?.uid ?: "",
+                user = _userRestrictions.value,
+                date = date
             )
         }
     }

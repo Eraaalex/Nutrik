@@ -79,7 +79,8 @@ fun FavouriteScreen(
                             product = product,
                             isForbidden = false,
                             navController = navController
-                        )
+                        ) {
+                        }
                     }
 
                     if (isLoading) {
