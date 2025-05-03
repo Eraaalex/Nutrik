@@ -2,6 +2,12 @@ package com.hse.coursework.nutrik.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.hse.coursework.nutrik.data.dao.ChatDao
 import com.hse.coursework.nutrik.data.dao.ConsumeDao
 import com.hse.coursework.nutrik.data.dao.FavoriteDao
 import com.hse.coursework.nutrik.data.dao.ProductDao
@@ -12,9 +18,8 @@ import com.hse.coursework.nutrik.repository.chat.ChatRepository
 import com.hse.coursework.nutrik.repository.consumption.ConsumptionRepository
 import com.hse.coursework.nutrik.repository.consumption.ConsumptionRepositoryImpl
 import com.hse.coursework.nutrik.repository.product.ProductRepository
-import com.hse.coursework.nutrik.repository.progress.ProgressRemoteDataSource
 import com.hse.coursework.nutrik.repository.user.UserRepository
-import com.hse.coursework.nutrik.service.BarcodeScanner
+import com.hse.coursework.nutrik.service.BarcodeScannerService
 import com.hse.coursework.nutrik.service.FirebaseService
 import com.hse.coursework.nutrik.service.RemoteAuthService
 import dagger.Module
@@ -72,13 +77,31 @@ object DomainModule {
     @Provides
     @Singleton
     fun provideChatRepository(
+        chatDao: ChatDao
     ): ChatRepository {
-        return ChatRepository()
+        return ChatRepository(chatDao)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideBarcodeScanner(
+        productRepository: ProductRepository,
+        barcodeScanner: BarcodeScanner,
+        textRecognizer: TextRecognizer
+    ): BarcodeScannerService {
+        return BarcodeScannerService(productRepository, barcodeScanner, textRecognizer)
     }
 
     @Provides
     @Singleton
-    fun provideBarcodeScanner(productRepository: ProductRepository): BarcodeScanner {
-        return BarcodeScanner(productRepository)
+    fun provideBarcodeMLKitScanner(): BarcodeScanner {
+        return BarcodeScanning.getClient()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTextMLKitScanner(): TextRecognizer {
+        return TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     }
 }

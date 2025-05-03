@@ -3,6 +3,7 @@ package com.hse.coursework.nutrik.di
 import android.content.Context
 import androidx.room.Room
 import com.hse.coursework.nutrik.data.AppDatabase
+import com.hse.coursework.nutrik.data.dao.ChatDao
 import com.hse.coursework.nutrik.data.dao.ConsumeDao
 import com.hse.coursework.nutrik.data.dao.FavoriteDao
 import com.hse.coursework.nutrik.data.dao.ProductDao
@@ -15,6 +16,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
@@ -24,11 +28,20 @@ object DataModule {
     @Singleton
     fun provideRoomDatabase(@ApplicationContext context: Context): AppDatabase {
 
-        return Room.databaseBuilder(
+        val db = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "nutrik_database"
-        ).fallbackToDestructiveMigration().build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+
+
+        CoroutineScope(Dispatchers.IO).launch {
+            db.clearAllTables()
+        }
+
+        return db
     }
 
     @Provides
@@ -55,6 +68,12 @@ object DataModule {
     @Singleton
     fun provideConsumptionDao(database: AppDatabase): ConsumeDao {
         return database.consumptionDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatDao(database: AppDatabase): ChatDao {
+        return database.chatDao()
     }
 
 
