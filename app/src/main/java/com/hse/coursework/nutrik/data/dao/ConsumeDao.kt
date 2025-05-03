@@ -52,16 +52,6 @@ interface ConsumeDao {
 
     @Query(
         """
-        UPDATE consumptions 
-        SET weight = :newWeight 
-        WHERE id = :consumptionId 
-        AND userId = :userId
-    """
-    )
-    suspend fun updateWeight(userId: String, consumptionId: Long, newWeight: Double)
-
-    @Query(
-        """
         SELECT * FROM consumptions 
         WHERE userId = :userId 
         AND date BETWEEN :startDate AND :endDate
@@ -87,5 +77,18 @@ interface ConsumeDao {
         start: String,
         end: String
     ): List<ConsumptionEntity>
+
+    @Delete
+    suspend fun deleteConsumption(toEntity: ConsumptionEntity)
+
+
+    @Query(""" 
+        SELECT * FROM consumptions 
+        WHERE userId = :userId 
+        AND date = :date 
+        AND productId = :productId
+      """
+    )
+    suspend fun getConsumptionByUserAndDate(userId: String, date: String, productId: String): ConsumptionEntity?
 
 }
