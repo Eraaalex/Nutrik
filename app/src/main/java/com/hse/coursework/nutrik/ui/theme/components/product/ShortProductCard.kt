@@ -38,14 +38,18 @@ import com.hse.coursework.nutrik.model.ProductEntity
 fun ShortProductCard(
     product: ProductEntity,
     isForbidden: Boolean,
-    navController: NavController
+    navController: NavController,
+    onNavigateToProduct: () -> Unit
 ) {
     Log.d("ShortProductCard", "Product: ${product}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { navController.navigate("product_detail_screen/${product.id}") },
+            .clickable {
+                navController.navigate("product_detail_screen/${product.id}")
+                onNavigateToProduct()
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -96,24 +100,3 @@ fun ShortProductCard(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProductCardPreview() {
-    val mockProduct = ProductEntity(
-        code = "1",
-        name = "Brötchen",
-        energyValue = 200.0,
-        proteins = 5.0,
-        fats = 2.0,
-        carbs = 40.0,
-    )
-
-    MaterialTheme {
-        ShortProductCard(
-            product = mockProduct,
-            isForbidden = true,
-            navController = rememberNavController()
-
-        )
-    }
-}

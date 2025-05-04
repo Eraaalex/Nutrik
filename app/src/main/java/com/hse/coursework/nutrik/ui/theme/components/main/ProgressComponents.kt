@@ -2,6 +2,14 @@ package com.hse.coursework.nutrik.ui.theme.components.main
 
 
 import android.app.DatePickerDialog
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hse.coursework.nutrik.R
 import com.hse.coursework.nutrik.model.Consumption
+import com.hse.coursework.nutrik.model.ProgressItem
 import com.hse.coursework.nutrik.ui.theme.screen.main.ProgressUiState
 import com.hse.coursework.nutrik.utils.ColorUtil
 import java.time.LocalDate
@@ -88,12 +97,53 @@ fun ScanButton(onClick: () -> Unit) {
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgressContent(
     uiState: ProgressUiState,
     onSelectDate: (LocalDate) -> Unit,
-    weeklyConsumption: List<Consumption>
+    weeklyConsumption: List<Consumption>,
+    onUpdateConsumption: (Consumption, Double) -> Unit,
+    onDeleteConsumption: (Consumption) -> Unit
 ) {
+
+    AnimatedContent(
+        targetState = uiState.selectedDate,
+        transitionSpec = {
+
+            if (targetState > initialState) {
+                slideInHorizontally { width -> width } + fadeIn() with
+                        slideOutHorizontally { width -> -width } + fadeOut()
+            } else {
+                slideInHorizontally { width -> -width } + fadeIn() with
+                        slideOutHorizontally { width -> width } + fadeOut()
+            }
+                .using(SizeTransform(false))
+        }, label = ""
+    ) { animatedDate ->
+        ContentByDate(
+            date = animatedDate,
+            uiState = uiState,
+            weeklyConsumption = weeklyConsumption,
+            onSelectDate = onSelectDate,
+            onUpdateConsumption = onUpdateConsumption,
+            onDeleteConsumption = onDeleteConsumption,
+        )
+
+
+    }
+}
+
+@Composable
+fun ContentByDate(
+    date: LocalDate ,
+    uiState: ProgressUiState,
+    weeklyConsumption: List<Consumption>,
+    onSelectDate: (LocalDate) -> Unit,
+    onUpdateConsumption: (Consumption, Double) -> Unit,
+    onDeleteConsumption: (Consumption) -> Unit,
+) {
+
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
     val selectedDate = uiState.selectedDate
     val progress = uiState.progress
@@ -164,32 +214,37 @@ fun ProgressContent(
             val items = listOf(
                 ProgressBarCardData(
                     "Белки",
-                    "${data.protein} г",
+                    "${data.protein.toInt()} г",
                     data.protein / 100f,
                     Color(0xFF4CAF50)
                 ),
-                ProgressBarCardData("Жиры", "${data.fat} г", data.fat / 100f, Color(0xFF4CAF50)),
+                ProgressBarCardData(
+                    "Жиры",
+                    "${data.fat.toInt()} г",
+                    data.fat / 100f,
+                    Color(0xFF4CAF50)
+                ),
                 ProgressBarCardData(
                     "Углеводы",
-                    "${data.carbs} г",
+                    "${data.carbs.toInt()} г",
                     data.carbs / 300f,
                     Color(0xFFFF9800)
                 ),
                 ProgressBarCardData(
                     "Калории",
-                    "${data.calories}",
+                    "${data.calories.toInt()}",
                     data.calories / 2000f,
                     Color(0xFF2196F3)
                 ),
                 ProgressBarCardData(
                     "Сахар",
-                    "${if (data.sugar > 0) data.sugar else 0} г",
+                    "${if (data.sugar > 0) data.sugar.toInt() else 0} г",
                     data.sugar / 30f,
                     Color(0xFFF44336)
                 ),
                 ProgressBarCardData(
                     "Соль",
-                    "${if (data.salt > 0) data.salt else 0} г",
+                    "${if (data.salt > 0) data.salt.toInt() else 0} г",
                     data.salt / 5f,
                     Color(0xFF4CAF50)
                 )
@@ -242,7 +297,13 @@ fun ProgressContent(
                 if (weeklyConsumption.isNotEmpty()) {
                     FoodDiaryTable(
                         weeklyConsumption = weeklyConsumption,
-                        selectedDate = selectedDate
+                        selectedDate = uiState.selectedDate,
+                        onUpdateConsumption = { entry, newWeight ->
+                            onUpdateConsumption(entry, newWeight)
+                        },
+                        onDeleteConsumption = { entry ->
+                            onDeleteConsumption(entry)
+                        }
                     )
                 }
             }
@@ -262,7 +323,7 @@ fun ProgressContent(
 fun ProgressBarCard(
     title: String,
     value: String,
-    progress: Float,
+    progress: Double,
     progressColor: Color
 ) {
     Card(
@@ -288,7 +349,7 @@ fun ProgressBarCard(
                     modifier = Modifier.fillMaxSize()
                 )
                 CircularProgressIndicator(
-                    progress = progress.coerceIn(0f, 1f),
+                    progress = progress.coerceIn(0.0, 1.0).toFloat(),
                     strokeWidth = 8.dp,
                     color = progressColor,
                     modifier = Modifier.fillMaxSize()
@@ -318,7 +379,7 @@ fun ProgressBarCardPreview() {
     ProgressBarCard(
         title = "Белки",
         value = "80 г",
-        progress = 0.8f,
+        progress = 0.8,
         progressColor = Color(0xFF4CAF50)
     )
 }
@@ -326,6 +387,6 @@ fun ProgressBarCardPreview() {
 data class ProgressBarCardData(
     val title: String,
     val value: String,
-    val progress: Float,
+    val progress: Double,
     val progressColor: Color
 )

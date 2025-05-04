@@ -120,28 +120,31 @@ fun CapturedPhotoView(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = {
-                    foundProduct?.let { onNavigateToProduct(it.id) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFDF6C8)),
-                shape = RoundedCornerShape(16.dp),
-                contentPadding = PaddingValues(vertical = 24.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+            if (foundProduct != null && !scanning){
+                Button(
+                    onClick = {
+                        onNavigateToProduct(foundProduct.id)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFDF6C8)),
+                    shape = RoundedCornerShape(16.dp),
+                    contentPadding = PaddingValues(vertical = 24.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                 ) {
-                    Spacer(modifier = Modifier.width(12.dp))
-                    androidx.compose.material3.Text(
-                        text = "Перейти к карточке продукта",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4E2215),
-                        fontSize = 16.sp
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Spacer(modifier = Modifier.width(12.dp))
+                        androidx.compose.material3.Text(
+                            text = "Перейти к карточке продукта",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4E2215),
+                            fontSize = 16.sp
+                        )
+                    }
                 }
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))

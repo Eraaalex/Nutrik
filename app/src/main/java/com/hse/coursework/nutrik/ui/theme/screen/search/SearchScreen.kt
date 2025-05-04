@@ -70,6 +70,7 @@ fun SearchScreen(
 
     LaunchedEffect(searchQuery) {
         if (searchQuery.isBlank()) {
+            Log.e("SearchScreen", "productList: $productList")
             viewModel.loadProducts(reset = true)
         }
     }

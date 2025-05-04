@@ -96,6 +96,7 @@ fun ProductDetailScreen(
 
         is ProductState.Success -> {
             val product = (productState as ProductState.Success).product
+            Log.e("ProductDetailScreen", "Product 98: $product")
             var newWeight by remember { mutableStateOf(product.weight) }
 
             Scaffold(
@@ -295,6 +296,7 @@ fun ProductDetailContent(
                     modifier = Modifier.width(150.dp)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
+                Log.e("ProductDetailContent", "Salt value: ${product.salt}")
                 NutrientBox(
                     text = if (product.salt == -1.0) "Нет данных" else "${product.salt} г",
                     label = "Соль",

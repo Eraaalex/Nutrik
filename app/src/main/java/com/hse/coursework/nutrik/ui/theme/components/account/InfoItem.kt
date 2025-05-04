@@ -52,7 +52,6 @@ fun InfoItem(
 fun genderToText(gender: Gender): String = when (gender) {
     Gender.MALE -> "Мужской"
     Gender.FEMALE -> "Женский"
-    Gender.OTHER -> "Другое"
     Gender.UNSPECIFIED -> "Не указано"
 }
 

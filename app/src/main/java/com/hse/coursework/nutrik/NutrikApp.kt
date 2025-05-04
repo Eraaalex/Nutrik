@@ -42,11 +42,8 @@ fun NutrikApp(authViewModel: AuthViewModel = hiltViewModel()) {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route
+        startDestination = if (isUserAuthenticated) Screen.Main.route else Screen.Auth.route
     ) {
-        composable(Screen.Splash.route) {
-            SplashScreen()
-        }
         composable(Screen.Auth.route) {
             AuthScreen(
                 onAuthSuccess = {

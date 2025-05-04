@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id("jacoco")
 }
 
 android {
@@ -21,6 +22,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -65,6 +67,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:25.1.1")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+    implementation("androidx.test:core-ktx:1.6.1")
+    implementation("androidx.test.ext:junit-ktx:1.2.1")
+    implementation("androidx.xr.runtime:runtime:1.0.0-alpha04")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -166,8 +171,86 @@ dependencies {
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Test
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("app.cash.turbine:turbine:1.0.0")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("org.robolectric:robolectric:4.10.3")
+    implementation("androidx.multidex:multidex:2.0.1")
+
+    testImplementation("androidx.multidex:multidex:2.0.1")
+    androidTestImplementation("androidx.multidex:multidex:2.0.1")
+
+    // Compose UI testing
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.8.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.2")
+
+    // AndroidX Test
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+    // Hilt for instrumentation tests
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48")
+
+    implementation("com.google.dagger:hilt-android-testing:2.48@aar")
+
+
 }
+
+
 
 kapt {
     correctErrorTypes = true
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/com/hse/coursework/nutrik/model/**",
+        "**/com/hse/coursework/nutrik/ui/**",
+        "**/com/hse/coursework/nutrik/data/**",
+        "**/com/hse/coursework/nutrik/di/**",
+        "**/com/hse/coursework/nutrik/utils/**",
+        "**/com/hse/coursework/nutrik/navigation/**",
+        "**/com/hse/coursework/nutrik/network/GPTResponse.class",
+        "**/com/hse/coursework/nutrik/NutrikApp.class",
+        "**/network/*\$*",
+        "**/network/RetrofitInstance*",
+        "**/Hilt_*.*",
+        "**/NutrikAppKt*.*",
+        "**/MainActivityKt*.*",
+        "**/ComposableSingletons*.*"
+    )
+
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(
+        fileTree(buildDir).include(
+            "jacoco/testDebugUnitTest.exec"
+        )
+    )
 }

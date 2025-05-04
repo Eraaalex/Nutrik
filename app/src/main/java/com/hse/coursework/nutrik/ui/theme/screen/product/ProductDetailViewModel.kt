@@ -36,7 +36,7 @@ class ProductDetailViewModel @Inject constructor(
     private val _productState = MutableStateFlow<ProductState>(ProductState.Loading)
     val productState: StateFlow<ProductState> = _productState.asStateFlow()
 
-    private var _product: Product? = null;
+    var _product: Product? = null;
 
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite.asStateFlow()
@@ -80,6 +80,7 @@ class ProductDetailViewModel @Inject constructor(
                         _productState.value = ProductState.Success(product)
                         _product = product.toUI()
                         Log.e("ProductDetailViewModel", "Product loaded: $product")
+                        Log.e("ProductDetailViewModel", "Product State loaded: ${_productState.value}")
                     } else {
                         _productState.value = ProductState.Error("Продукт не найден")
                     }
