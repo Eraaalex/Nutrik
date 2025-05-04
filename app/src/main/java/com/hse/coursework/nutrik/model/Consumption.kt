@@ -26,7 +26,7 @@ fun ConsumptionDTO.toConsumption(): Consumption {
         productId = productId,
         userId = userId,
         productName = productName,
-        date = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE),
+        date = LocalDate.parse(date.ifBlank { "2025-05-13" }, DateTimeFormatter.ISO_LOCAL_DATE),
         weight = weight
     )
 }
@@ -41,9 +41,9 @@ fun Consumption.toDTO(): ConsumptionDTO {
     )
 }
 
-@Entity(tableName = "consumptions")
+@Entity(tableName = "consumptions",
+    primaryKeys = ["userId","productId","date"])
 data class ConsumptionEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val productId: String,
     val productName: String,
     val userId: String,
@@ -61,7 +61,7 @@ fun Consumption.toEntity() = ConsumptionEntity(
 
 fun ConsumptionEntity.toConsumption() = Consumption(
     productId = productId,
-    date = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE),
+    date = LocalDate.parse(date.ifBlank { "2025-05-13" }, DateTimeFormatter.ISO_LOCAL_DATE),
     weight = weight,
     userId = userId,
     productName = productName

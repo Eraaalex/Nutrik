@@ -1,11 +1,13 @@
 package com.hse.coursework.nutrik.repository.progress
 
+import android.util.Log
 import com.hse.coursework.nutrik.model.Product
 import com.hse.coursework.nutrik.model.ProgressItem
-import com.hse.coursework.nutrik.repository.user.UserRepository
+import com.hse.coursework.nutrik.model.Restriction
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class ProgressService @Inject constructor(
     private val progressRepository: ProgressRepository,
@@ -14,50 +16,64 @@ class ProgressService @Inject constructor(
         product: Product,
         newWeight: Double,
         userId: String,
-        date: LocalDate = LocalDate.now()
+        date: LocalDate = LocalDate.now(),
+        user: List<Restriction>
     ) {
-        val existingProgress = progressRepository.getProgressForDate(userId, date).firstOrNull()
+        val existing = progressRepository.getProgressForDate(userId, date).firstOrNull()
+        val ratio = newWeight / 100.0
 
-        val weightRatio = newWeight / 100.0
+        val deltaProtein = (product.proteins * ratio)
+        val deltaFat = (product.fats * ratio)
+        val deltaCarbs = (product.carbs * ratio)
+        val deltaCalories = (product.energyValue * ratio)
+        val deltaSugar = (product.sugar * ratio)
+        val deltaSalt = (product.salt * ratio)
 
-        val addedProtein = (product.proteins * weightRatio).toInt()
-        val addedFat = (product.fats * weightRatio).toInt()
-        val addedCarbs = (product.carbs * weightRatio).toInt()
-        val addedCalories = (product.energyValue * weightRatio).toInt()
-        val addedSugar = (product.sugar * weightRatio).toInt()
-        val addedSalt = (product.salt * weightRatio).toInt()
-
-        val newProgress = existingProgress?.copy(
-            protein = existingProgress.protein + addedProtein,
-            fat = existingProgress.fat + addedFat,
-            carbs = existingProgress.carbs + addedCarbs,
-            calories = existingProgress.calories + addedCalories,
-            sugar = existingProgress.sugar + addedSugar,
-            salt = existingProgress.salt + addedSalt
+        val updated = existing?.copy(
+            protein = (existing.protein + deltaProtein).coerceAtLeast(0.0),
+            fat = (existing.fat + deltaFat).coerceAtLeast(0.0),
+            carbs = (existing.carbs + deltaCarbs).coerceAtLeast(0.0),
+            calories = (existing.calories + deltaCalories).coerceAtLeast(0.0),
+            sugar = (existing.sugar + deltaSugar).coerceAtLeast(0.0),
+            salt = (existing.salt + deltaSalt).coerceAtLeast(0.0),
+            violationsCount = getViolationCount(product, existing, user, newWeight),
+            date = date
+        ) ?: ProgressItem(
+            date = date,
+            protein = deltaProtein,
+            fat = deltaFat,
+            carbs = deltaCarbs,
+            calories = deltaCalories,
+            sugar = deltaSugar,
+            salt = deltaSalt,
+            violationsCount = getViolationCount(product, null, user, newWeight)
         )
-            ?: ProgressItem(
-                date = date,
-                protein = addedProtein,
-                fat = addedFat,
-                carbs = addedCarbs,
-                calories = addedCalories,
-                sugar = addedSugar,
-                salt = addedSalt,
-                violationsCount = 0
-            )
 
-        progressRepository.saveProgress(userId, newProgress)
+        progressRepository.saveProgress(userId, updated)
         progressRepository.fetchInitialDataForLastWeek(userId)
     }
 
     private fun getViolationCount(
         product: Product,
-        progress: ProgressItem
+        progress: ProgressItem?,
+        userRestrictions: List<Restriction>,
+        newWeight: Double
     ): Int {
-        var violationsCount = 0
-
-
-
+        Log.e("ProgressService", "getViolationCount called with product: $product, progress: $progress, userRestrictions: $userRestrictions, newWeight: $newWeight")
+        var violationsCount = progress?.violationsCount ?: 0
+        Log.e("ProgressService", "Initial violationsCount: $violationsCount")
+        if (userRestrictions.isEmpty() || product.allergens.isEmpty()) {
+            return violationsCount
+        }
+Log.e("ProgressService", "User restrictions: $userRestrictions, Product allergens: ${product.allergens}")
+        if (newWeight <= 0 && product.allergens.any { it in userRestrictions }) {
+            return (--violationsCount).coerceAtLeast(0)
+        }
+        Log.e("ProgressService", "Checking allergens against user restrictions")
+        if (product.allergens.any { it in userRestrictions }) {
+            violationsCount++
+        }
+Log.e("ProgressService", "Final violationsCount: $violationsCount")
         return violationsCount
     }
 

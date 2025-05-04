@@ -21,7 +21,9 @@ interface ConsumptionRepository {
         cacheScope: CoroutineScope
     ): List<Consumption>
 
-    suspend fun updateConsumption(product: ProductEntity, newWeight: Double, userId: String)
+    suspend fun updateConsumption(product: ProductEntity, newWeight: Double, userId: String, date: LocalDate = LocalDate.now())
+    suspend fun updateConsumption(product: Consumption, newWeight: Double)
+    suspend fun deleteConsumption(entry: Consumption)
 }
 
 class ConsumptionRepositoryImpl @Inject constructor(
@@ -32,20 +34,40 @@ class ConsumptionRepositoryImpl @Inject constructor(
     override suspend fun updateConsumption(
         product: ProductEntity,
         newWeight: Double,
-        userId: String
+        userId: String,
+        date: LocalDate
     ) {
         val consumption = Consumption(
             productId = product.id,
-            date = LocalDate.now(),
+            date = date,
             weight = newWeight,
             userId = userId,
             productName = product.name
         )
 
         if (consumption.date.isAfter(LocalDate.now().minusDays(3))) {
-            localDataSource.insertConsumption(consumption)
+            localDataSource.smartInsertConsumption(consumption)
         }
         remoteDataSource.insertConsumption(consumption)
+    }
+
+    override suspend fun updateConsumption(
+        consumption: Consumption,
+        newWeight: Double
+    ) {
+        val newConsumption = consumption.copy(
+            weight = newWeight,
+        )
+
+        localDataSource.insertConsumption(newConsumption)
+        remoteDataSource.insertConsumption(newConsumption)
+    }
+
+    override suspend fun deleteConsumption(entry: Consumption) {
+
+        localDataSource.deleteConsumption(entry)
+
+        remoteDataSource.deleteConsumption(entry)
     }
 
     override fun getDailyConsumption(userId: String, date: LocalDate): Flow<List<Consumption>> {
@@ -72,7 +94,9 @@ class ConsumptionRepositoryImpl @Inject constructor(
         val localDates = local.map { it.date }.toSet()
 
         val missingDates = getDatesBetween(startDate, endDate).filterNot { it in localDates }
-
+        if (local.size == missingDates.size) {
+            return local
+        }
         val remote = if (missingDates.isNotEmpty()) {
             remoteDataSource.getConsumptionByDates(userId, missingDates)
         } else emptyList()

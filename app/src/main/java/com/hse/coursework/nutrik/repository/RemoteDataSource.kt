@@ -10,6 +10,7 @@ import com.hse.coursework.nutrik.model.toDTO
 import com.hse.coursework.nutrik.service.FirebaseService
 import com.hse.coursework.nutrik.service.PaginatedResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
 import javax.inject.Inject
@@ -49,15 +50,12 @@ class RemoteDataSource @Inject constructor(private val firebaseService: Firebase
         firebaseService.insertConsumption(consumption.toDTO())
     }
 
-    fun getByName(name: String): Flow<ProductEntity?> = flow {
+    fun getByName(name: String): Flow<ProductEntity?> =  flow {
         Log.d("RemoteDataSource", "Fetching product by name from Firebase")
-        try {
-            val product = firebaseService.getProductByName(name)
-            emit(product)
-        } catch (e: Exception) {
-            emit(null)
-        }
-    }
+        val product = firebaseService.getProductByName(name)
+        emit(product)
+    }.catch { emit(null) }
+
 
     suspend fun getConsumptionByDates(
         userId: String,
@@ -66,6 +64,11 @@ class RemoteDataSource @Inject constructor(private val firebaseService: Firebase
         val snapshot = firebaseService.getConsumptionByDates(userId, dates)
         Log.e("RemoteDataSource", "snapshot = $snapshot")
         return snapshot.map { it.toConsumption() }
+    }
+
+    suspend fun deleteConsumption(entry: Consumption) {
+        Log.e("RemoteDataSource", "Deleting consumption entry: $entry")
+        firebaseService.deleteConsumption(entry.toDTO())
     }
 
 

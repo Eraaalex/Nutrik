@@ -2,6 +2,7 @@ package com.hse.coursework.nutrik.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.firestore.IgnoreExtraProperties
 import com.hse.coursework.nutrik.utils.ConverterUtil
 import kotlinx.serialization.Serializable
 
@@ -15,12 +16,12 @@ data class ProductEntity(
     val category: String = "",
     val name: String = "def",
     val unit: String = "",
-    val proteins: Double = -1.0,
-    val fats: Double = -1.0,
-    val carbs: Double = -1.0,
-    val energyValue: Double = -1.0,
-    val sugar: Double = -1.0,
-    val salt: Double = -1.0,
+    val proteins: Double = 0.0,
+    val fats: Double = 0.0,
+    val carbs: Double = 0.0,
+    val energyValue: Double = 0.0,
+    val sugar: Double = 0.0,
+    val salt: Double = 0.0,
     val composition: List<String> = ArrayList<String>(),
     val manufacturer: String = "",
     val brand: String = "",
@@ -33,18 +34,19 @@ data class ProductEntity(
 
 // DTO для Firestore
 @Serializable
+@IgnoreExtraProperties
 data class ProductDTO(
     var id: String = "def",
     val code: String = "",
     val category: String? = "",
     val name: String? = "",
     val unit: String? = "",
-    val proteins: Double? = -1.0,
-    val fats: Double? = -1.0,
-    val carbs: Double? = -1.0,
-    val energyValue: Double? = -1.0,
-    val sugar: Double = -1.0,
-    val salt: Double = -1.0,
+    val proteins: Double? = 0.0,
+    val fats: Double? = 0.0,
+    val carbs: Double? = 0.0,
+    val energyValue: Double? = 0.0,
+    val sugar: Double = 0.0,
+    val salt: Double = 0.0,
     val composition: List<String>? = null,
     val manufacturer: String? = null,
     val brand: String? = null,
@@ -137,7 +139,9 @@ fun ProductEntity.toUI(): Product {
         weight = weight,
         description = description,
         imageLinks = imageLinks,
-        allergens = ConverterUtil.fromStringToRestrictionSet(allergens)
+        allergens = ConverterUtil.fromStringToRestrictionSet(allergens),
+        sugar = sugar,
+        salt = salt
     )
 }
 
@@ -170,12 +174,12 @@ data class Product(
     val category: String = "",
     val name: String = "def",
     val unit: String = "",
-    val proteins: Double = -1.0,
-    val fats: Double = -1.0,
-    val carbs: Double = -1.0,
-    val energyValue: Double = -1.0,
-    val sugar: Double = -1.0,
-    val salt: Double = -1.0,
+    val proteins: Double = 0.0,
+    val fats: Double = 0.0,
+    val carbs: Double = 0.0,
+    val energyValue: Double = 0.0,
+    val sugar: Double = 0.0,
+    val salt: Double = 0.0,
     val composition: List<String> = ArrayList<String>(),
     val manufacturer: String = "",
     val brand: String = "",

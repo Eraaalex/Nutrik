@@ -3,10 +3,9 @@ package com.hse.coursework.nutrik.service
 
 import android.graphics.Bitmap
 import android.net.Uri
-import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.google.mlkit.vision.text.TextRecognizer
 import com.hse.coursework.nutrik.model.ProductEntity
 import com.hse.coursework.nutrik.model.camera.CameraScanResult
 import com.hse.coursework.nutrik.repository.product.ProductRepository
@@ -17,11 +16,12 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
-class BarcodeScanner @Inject constructor(
-    private val productRepository: ProductRepository
+class BarcodeScannerService @Inject constructor(
+    private val productRepository: ProductRepository,
+    private val barcodeScanner: BarcodeScanner,
+    private val textRecognizer: TextRecognizer
+
 ) {
-    private val barcodeScanner = BarcodeScanning.getClient()
-    private val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     suspend fun analyze(bitmap: Bitmap): CameraScanResult {
         val image = InputImage.fromBitmap(bitmap, 0)

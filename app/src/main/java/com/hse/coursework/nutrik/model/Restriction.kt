@@ -6,7 +6,7 @@ enum class Restriction(val key: String, val russianName: String) {
 
 
     // Аллергии
-    NUT("nut", "Орехи"),
+    NUT("nuts", "Орехи"),
     SEAFOOD("seafood", "Морепродукты"),
     LACTOSE("lactose", "Молоко"),
     EGG("egg", "Яйца"),

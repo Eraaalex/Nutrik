@@ -12,12 +12,12 @@ import java.time.LocalDate
 data class ProgressEntity(
     val userId: String,
     val date: String,
-    val protein: Int,
-    val fat: Int,
-    val carbs: Int,
-    val calories: Int,
-    val sugar: Int,
-    val salt: Int,
+    val protein: Double,
+    val fat: Double,
+    val carbs: Double,
+    val calories: Double,
+    val sugar: Double,
+    val salt: Double,
     val violationsCount: Int,
     val violations: List<Restriction> = emptyList()
 ) {

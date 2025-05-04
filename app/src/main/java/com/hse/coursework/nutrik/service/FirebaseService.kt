@@ -33,8 +33,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
 
     /** users/{userId}/progress/{date} */
     suspend fun getProgressForDate(userId: String, date: LocalDate): ProgressItem? {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users")
+        val userRef = firebaseFirestore.collection("users")
             .document(userId)
             .collection(PROGRESS_COLLECTION)
             .document(date.format(DateTimeFormatter.ofPattern(DATE_FIELD)))
@@ -112,8 +111,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
     }
 
     suspend fun insertConsumption(consumption: ConsumptionDTO) {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users")
+        val userRef = firebaseFirestore.collection("users")
             .document(consumption.userId)
             .collection("consumption")
             .document(consumption.date)
@@ -143,8 +141,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
         date: String,
         productId: String
     ): ConsumptionDTO? {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users")
+        val userRef = firebaseFirestore.collection("users")
             .document(userId)
             .collection("consumption")
             .document(date)
@@ -163,8 +160,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
         startDate: String,
         endDate: String
     ): List<ConsumptionDTO> {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("users")
+        val userRef = firebaseFirestore.collection("users")
             .document(userId)
             .collection("consumption")
 
@@ -197,7 +193,7 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
         val normalizedQuery = query.lowercase().trim()
 
         val result = firebaseFirestore.collection(PRODUCT_COLLECTION)
-            .orderBy("name_lower")
+            .orderBy("name_lowercase")
             .startAt(normalizedQuery)
             .endAt("$normalizedQuery\uf8ff")
             .get()
@@ -224,9 +220,8 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
         fromDate: LocalDate,
         toDate: LocalDate
     ): List<Pair<LocalDate, ProgressItem>> {
-        val db = firebaseFirestore
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val collectionRef = db.collection("users")
+        val collectionRef = firebaseFirestore.collection("users")
             .document(userId)
             .collection("progress")
 
@@ -274,6 +269,30 @@ class FirebaseService @Inject constructor(private val firebaseFirestore: Firebas
 
         return snapshot.documents.flatMap { doc ->
             doc.toObject(ConsumptionList::class.java)?.consumptions.orEmpty()
+        }
+    }
+
+    suspend fun deleteConsumption(toDTO: ConsumptionDTO) {
+        val userRef = firebaseFirestore.collection("users")
+            .document(toDTO.userId)
+            .collection(CONSUMPTION_COLLECTION)
+            .document(toDTO.date)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val consumptionList = document.toObject(ConsumptionList::class.java)?.consumptions ?: mutableListOf()
+                consumptionList.removeIf { it.productId == toDTO.productId }
+
+                userRef.set(mapOf("consumptions" to consumptionList))
+                    .addOnSuccessListener {
+                        Log.d("FirebaseService", "Consumption deleted successfully")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirebaseService", "Error deleting consumption: ${e.localizedMessage}")
+                    }
+            } else {
+                Log.w("FirebaseService", "No consumption found for date ${toDTO.date}")
+            }
         }
     }
 

@@ -11,5 +11,5 @@ data class User(
 )
 
 enum class Gender {
-    MALE, FEMALE, OTHER, UNSPECIFIED
+    MALE, FEMALE, UNSPECIFIED
 }

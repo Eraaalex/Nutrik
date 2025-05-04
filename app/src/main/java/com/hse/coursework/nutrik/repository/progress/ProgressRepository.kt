@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import javax.inject.Inject
@@ -38,30 +40,33 @@ class ProgressRepositoryImpl @Inject constructor(
     override fun getProgressForDate(
         userId: String,
         date: LocalDate
-    ): Flow<ProgressItem?> = flow {
-        val localProgress = dao.getByUserAndDate(userId, date.toString()).firstOrNull()
-        if (localProgress != null) {
-            emit(localProgress.toDomain())
-        } else {
-            val remoteProgress = remote.getProgressForDate(userId, date)
-            if (remoteProgress != null) {
-                dao.insert(remoteProgress.toEntity(userId, date.toString()))
-                emit(remoteProgress)
-            } else {
-                emit(
-                    ProgressItem(
-                        date = date,
-                        protein = 0,
-                        fat = 0,
-                        carbs = 0,
-                        calories = 0,
-                        sugar = 0,
-                        salt = 0,
-                        violationsCount = 0
-                    )
+    ): Flow<ProgressItem> {
+        val dateStr = date.toString()
+        return dao
+            .getByUserAndDate(userId, dateStr)                // Flow<ProgressEntity?>
+            .map { entity ->
+                // как только в БД вставят новую запись — сюда приедет новый entity
+                entity?.toDomain() ?: ProgressItem(
+                    date     = date,
+                    protein  = 0.0,
+                    fat      = 0.0,
+                    carbs    = 0.0,
+                    calories = 0.0,
+                    sugar    = 0.0,
+                    salt     = 0.0,
+                    violationsCount = 0
                 )
             }
-        }
+            .onStart {
+                // один раз при подписке — попробуем подгрузить из remote, если локально пусто
+                val hasLocal = dao.getByUserAndDate(userId, dateStr)
+                    .firstOrNull() != null
+                if (!hasLocal) {
+                    remote.getProgressForDate(userId, date)?.also { remoteItem ->
+                        dao.insert(remoteItem.toEntity(userId, dateStr))
+                    }
+                }
+            }
     }
 
     override suspend fun saveProgress(

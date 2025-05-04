@@ -5,12 +5,12 @@ import java.time.format.DateTimeFormatter
 
 data class ProgressItem(
     val date: LocalDate,      // Дата, за которую приведены данные
-    val protein: Int,         // Белки (граммы)
-    val fat: Int,             // Жиры (граммы)
-    val carbs: Int,           // Углеводы (граммы)
-    val calories: Int,        // Калории (ккал)
-    val sugar: Int,           // Сахар (граммы)
-    val salt: Int,            // Соль (граммы)
+    val protein: Double,         // Белки (граммы)
+    val fat: Double,             // Жиры (граммы)
+    val carbs: Double,           // Углеводы (граммы)
+    val calories: Double,        // Калории (ккал)
+    val sugar: Double,           // Сахар (граммы)
+    val salt: Double,            // Соль (граммы)
     val violationsCount: Int,  // Количество нарушений
     val violations: List<Restriction> = emptyList() // Список нарушений
 ) {
@@ -63,12 +63,12 @@ data class ProgressItem(
 
 data class ProgressRemoteEntity(
     var date: String = "",
-    var protein: Int = 0,
-    var fat: Int = 0,
-    var carbs: Int = 0,
-    var calories: Int = 0,
-    var sugar: Int = 0,
-    var salt: Int = 0,
+    var protein: Double = 0.0,
+    var fat: Double = 0.0,
+    var carbs: Double = 0.0,
+    var calories: Double = 0.0,
+    var sugar: Double = 0.0,
+    var salt: Double = 0.0,
     var violationsCount: Int = 0,
     var violations: List<Restriction> = emptyList()
 )

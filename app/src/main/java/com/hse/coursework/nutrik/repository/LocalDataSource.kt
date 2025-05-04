@@ -1,5 +1,6 @@
 package com.hse.coursework.nutrik.repository
 
+import android.util.Log
 import com.hse.coursework.nutrik.data.dao.ConsumeDao
 import com.hse.coursework.nutrik.data.dao.FavoriteDao
 import com.hse.coursework.nutrik.data.dao.ProductDao
@@ -76,6 +77,26 @@ class LocalDataSource @Inject constructor(
         consumeDao.insertConsumption(consumption.toEntity())
     }
 
+    suspend fun smartInsertConsumption(consumption: Consumption) {
+        val oldConsumption = consumeDao.getConsumptionByUserAndDate(
+            consumption.userId,
+            consumption.date.toString(),
+            consumption.productId
+        )
+        Log.e("LocalDataSource", "Smart insert: $oldConsumption")
+        if (oldConsumption != null) {
+            consumeDao.insertConsumption(
+                oldConsumption.copy(
+                    weight = oldConsumption.weight + consumption.weight,
+                )
+            )
+            Log.e("LocalDataSource", "Smart insert updated consumption")
+            return
+        } else {
+            consumeDao.insertConsumption(consumption.toEntity())
+
+        }
+     }
     fun getByName(name: String): Flow<ProductEntity?> = flow {
         productDao.getByName(name)
     }
@@ -91,6 +112,10 @@ class LocalDataSource @Inject constructor(
     ): List<Consumption> {
         return consumeDao.getConsumptionByDateRange(userId, start.toString(), end.toString())
             .map { it.toConsumption() }
+    }
+
+    suspend fun deleteConsumption(entry: Consumption) {
+        consumeDao.deleteConsumption(entry.toEntity())
     }
 
 }
